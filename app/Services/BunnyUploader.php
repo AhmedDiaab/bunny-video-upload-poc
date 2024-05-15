@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use App\Http\Requests\Bunny\CreateCollectionResponse;
+use App\Http\Requests\Bunny\VideoLibraryResponse;
 
 
 class BunnyUploader
@@ -39,7 +39,7 @@ class BunnyUploader
 
     /**
      * Create video library
-     * @return CreateCollectionResponse
+     * @return VideoLibraryResponse
      */
     public function CreateVideoLibrary(string $name)
     {
@@ -51,17 +51,56 @@ class BunnyUploader
         ]);
     }
 
+    /**
+     * List video libraries
+     * @return VideoLibraryResponse[]
+     */
     public function ListVideoLibraries()
     {
+        $url = "{$this->BaseURL}/videolibrary";
+        return Http::get($url, [
+            'headers' => $this->headers
+        ]);
     }
 
-    public function UpdateVideoLibrary()
+    /**
+     * Get video library
+     * @return VideoLibraryResponse
+     */
+    public function GetVideoLibrary(int $id)
     {
+        $url = "{$this->BaseURL}/videolibrary/{$id}";
+        return Http::get($url, [
+            'headers' => $this->headers
+        ]);
     }
 
-    public function DeleteVideoLibrary()
+    /**
+     * Update video library
+     * @return VideoLibraryResponse
+     */
+    public function UpdateVideoLibrary(int $id, VideoLibraryResponse $payload)
     {
+        $url = "{$this->BaseURL}/videolibrary/{$id}";
+        return Http::post($url, [
+            'body' => $payload,
+            'headers' => $this->headers
+        ]);
     }
+
+    /**
+     * Delete video library
+     * @return VideoLibraryResponse
+     */
+    public function DeleteVideoLibrary(int $id)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$id}";
+        return Http::delete($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /*----------------------------------------------------------------------------*/
 
     public function UploadVideo(string $name)
     {
