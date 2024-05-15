@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Requests\Bunny;
 
-class CreateCollectionResponse
+class VideoLibraryResponse
 {
     public int $Id;
     public string $Name;
