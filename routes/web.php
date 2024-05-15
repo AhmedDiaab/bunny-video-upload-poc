@@ -19,4 +19,4 @@ Route::get('/', function () {
 });
 
 
-Route::post('upload-url', [FileUploadController::class, 'GetUploadUrl']);
+Route::post('/upload-url', [FileUploadController::class, 'GetUploadUrl']);
