@@ -216,7 +216,7 @@ class BunnyUploader
      * Get video
      * @return VideoResponse
      */
-    public function GetVideo(int $libraryId, int $id)
+    public function GetVideo(int $libraryId, string $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
         return Http::get($url, [
@@ -228,7 +228,7 @@ class BunnyUploader
      * Update video
      * @return VideoResponse
      */
-    public function UpdateVideo(int $libraryId, int $id, UpdateVideo $payload)
+    public function UpdateVideo(int $libraryId, string $id, UpdateVideo $payload)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
         $this->headers['content-type'] = "application/json";
@@ -242,7 +242,7 @@ class BunnyUploader
      * Delete video collection
      * @return VideoCollectionResponse
      */
-    public function DeleteVideo(int $libraryId, int $id)
+    public function DeleteVideo(int $libraryId, string $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
         return Http::delete($url, [
@@ -255,7 +255,7 @@ class BunnyUploader
      * requires thumbnail url to be passed as a query parameter
      * @return BaseResponse
      */
-    public function SetThumbnail(int $libraryId, int $id, string $thumbnailUrl)
+    public function SetThumbnail(int $libraryId, string $id, string $thumbnailUrl)
     {
         $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/thumbnail?thumbnailUrl={$thumbnailUrl}";
         return Http::post($url, [
@@ -268,7 +268,7 @@ class BunnyUploader
      * requires payload and language
      * @return BaseResponse
      */
-    public function AddCaption(int $libraryId, int $id, string $lang, VideoCaption $payload)
+    public function AddCaption(int $libraryId, string $id, string $lang, VideoCaption $payload)
     {
         $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/captions/{$lang}";
         $this->headers['content-type'] = "application/json";
@@ -284,7 +284,7 @@ class BunnyUploader
      * requires language
      * @return BaseResponse
      */
-    public function RemoveCaption(int $libraryId, int $id, string $lang)
+    public function RemoveCaption(int $libraryId, string $id, string $lang)
     {
         $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/captions/{$lang}";
         return Http::delete($url, [
@@ -293,9 +293,13 @@ class BunnyUploader
     }
 
 
-    public function UploadVideo(string $name)
+    /**
+     * Upload video file
+     * Note: Can be replaced with GeneratePresignedUrl to upload from end-user side 
+     */
+    public function UploadVideo(string $id)
     {
-        $url = "{$this->BaseURL}/library/{$this->VideoLibraryId}/videos/{$name}";
+        $url = "{$this->BaseURL}/library/{$this->VideoLibraryId}/videos/{$id}";
         return Http::put($url, [
             'headers' => [
                 'AccessKey' => "{$this->ApiKey}",
@@ -307,7 +311,7 @@ class BunnyUploader
     /**
      * Generate url to be used for uploading file from client side
      */
-    function generatePresignedUrl(int $libraryId, int $expiresInInMS, string $videoId)
+    function GeneratePresignedUrl(int $libraryId, int $expiresInInMS, string $videoId)
     {
         // Endpoint for the Bunny.net Tus uploads
         $url = "https://video.bunnycdn.com/tusupload";
