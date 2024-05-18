@@ -10,9 +10,6 @@ use App\Http\Requests\Bunny\CreateVideo;
 use App\Http\Requests\Bunny\UpdateVideo;
 use App\Http\Requests\Bunny\VideoCaption;
 use App\Http\Requests\Bunny\VideoResponse;
-use DateTime;
-use Exception;
-
 class BunnyUploader
 {
 
