@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\Bunny\VideoLibraryResponse;
+use App\Http\Requests\Bunny\VideoCollectionResponse;
+
 
 
 class BunnyUploader
@@ -46,7 +48,7 @@ class BunnyUploader
         $url = "{$this->BaseURL}/videolibrary";
         $this->headers['content-type'] = "application/json";
         return Http::post($url, [
-            'body' => `{"Name": {$name}}`,
+            'body' => `{"Name": $name}`,
             'headers' => $this->headers
         ]);
     }
@@ -82,6 +84,7 @@ class BunnyUploader
     public function UpdateVideoLibrary(int $id, VideoLibraryResponse $payload)
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
+        $this->headers['content-type'] = "application/json";
         return Http::post($url, [
             'body' => $payload,
             'headers' => $this->headers
@@ -101,6 +104,80 @@ class BunnyUploader
     }
 
     /*----------------------------------------------------------------------------*/
+
+
+    /**
+     * Video Collection
+     */
+
+    /**
+     * Create video collection
+     * @return VideoCollectionResponse
+     */
+    public function CreateVideoCollection(int $libraryId, string $name)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections";
+        $this->headers['content-type'] = "application/json";
+        return Http::post($url, [
+            'body' => `{"name": $name}`,
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * List video collection
+     * @return VideoCollectionResponse[]
+     */
+    public function ListVideoCollections(int $libraryId)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections";
+        return Http::get($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Get video collection
+     * @return VideoCollectionResponse
+     */
+    public function GetVideoCollection(int $libraryId, int $id)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
+        return Http::get($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Update video collection
+     * @return VideoCollectionResponse
+     */
+    public function UpdateVideoCollection(int $libraryId, int $id, string $name)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
+        $this->headers['content-type'] = "application/json";
+        return Http::post($url, [
+            'body' => `{"name": $name}`,
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Delete video collection
+     * @return VideoCollectionResponse
+     */
+    public function DeleteVideoCollection(int $libraryId, int $id)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
+        return Http::delete($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+
+    /*----------------------------------------------------------------------------*/
+
+
 
     public function UploadVideo(string $name)
     {
