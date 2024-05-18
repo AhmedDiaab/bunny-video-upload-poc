@@ -49,8 +49,11 @@ class BunnyUploader
     {
         $url = "{$this->BaseURL}/videolibrary";
         $this->headers['content-type'] = "application/json";
+        $payload = [
+            'Name' => $name
+        ];
         return Http::post($url, [
-            'body' => `{"Name": $name}`,
+            'body' => json_encode($payload),
             'headers' => $this->headers
         ]);
     }
@@ -88,7 +91,7 @@ class BunnyUploader
         $url = "{$this->BaseURL}/videolibrary/{$id}";
         $this->headers['content-type'] = "application/json";
         return Http::post($url, [
-            'body' => $payload,
+            'body' => json_encode($payload),
             'headers' => $this->headers
         ]);
     }
@@ -120,8 +123,11 @@ class BunnyUploader
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections";
         $this->headers['content-type'] = "application/json";
+        $payload = [
+            'Name' => $name
+        ];
         return Http::post($url, [
-            'body' => `{"name": $name}`,
+            'body' => json_encode($payload),
             'headers' => $this->headers
         ]);
     }
@@ -158,8 +164,11 @@ class BunnyUploader
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
         $this->headers['content-type'] = "application/json";
+        $payload = [
+            'Name' => $name
+        ];
         return Http::post($url, [
-            'body' => `{"name": $name}`,
+            'body' => json_encode($payload),
             'headers' => $this->headers
         ]);
     }
