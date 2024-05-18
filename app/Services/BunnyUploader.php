@@ -2,11 +2,16 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Bunny\BaseResponse;
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\Bunny\VideoLibraryResponse;
 use App\Http\Requests\Bunny\VideoCollectionResponse;
-
-
+use App\Http\Requests\Bunny\CreateVideo;
+use App\Http\Requests\Bunny\UpdateVideo;
+use App\Http\Requests\Bunny\VideoCaption;
+use App\Http\Requests\Bunny\VideoResponse;
+use DateTime;
+use Exception;
 
 class BunnyUploader
 {
@@ -177,6 +182,115 @@ class BunnyUploader
 
     /*----------------------------------------------------------------------------*/
 
+    /**
+     * Video
+     */
+
+    /**
+     * Create video
+     * @return VideoResponse
+     */
+    public function CreateVideo(CreateVideo $payload, string $libraryId = $this->VideoLibraryId)
+    {
+        $url = "{$this->BaseURL}/library/{$libraryId}/videos";
+        $this->headers['content-type'] = "application/json";
+        return Http::post($url, [
+            'body' => json_encode($payload),
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * List videos
+     * @return VideoResponse[]
+     */
+    public function ListVideos(int $libraryId)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos";
+        return Http::get($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Get video
+     * @return VideoResponse
+     */
+    public function GetVideo(int $libraryId, int $id)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
+        return Http::get($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Update video
+     * @return VideoResponse
+     */
+    public function UpdateVideo(int $libraryId, int $id, UpdateVideo $payload)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
+        $this->headers['content-type'] = "application/json";
+        return Http::post($url, [
+            'body' => json_encode($payload),
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Delete video collection
+     * @return VideoCollectionResponse
+     */
+    public function DeleteVideo(int $libraryId, int $id)
+    {
+        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
+        return Http::delete($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Set thumbnail to video
+     * requires thumbnail url to be passed as a query parameter
+     * @return BaseResponse
+     */
+    public function SetThumbnail(int $libraryId, int $id, string $thumbnailUrl)
+    {
+        $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/thumbnail?thumbnailUrl={$thumbnailUrl}";
+        return Http::post($url, [
+            'headers' => $this->headers
+        ]);
+    }
+
+    /**
+     * Add caption to video
+     * requires payload and language
+     * @return BaseResponse
+     */
+    public function AddCaption(int $libraryId, int $id, string $lang, VideoCaption $payload)
+    {
+        $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/captions/{$lang}";
+        $this->headers['content-type'] = "application/json";
+        return Http::post($url, [
+            'body' => json_encode($payload),
+            'headers' => $this->headers
+        ]);
+    }
+
+
+    /**
+     * Delete caption for video
+     * requires language
+     * @return BaseResponse
+     */
+    public function RemoveCaption(int $libraryId, int $id, string $lang)
+    {
+        $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/captions/{$lang}";
+        return Http::delete($url, [
+            'headers' => $this->headers
+        ]);
+    }
 
 
     public function UploadVideo(string $name)
@@ -189,4 +303,41 @@ class BunnyUploader
             ]
         ]);
     }
+
+    /**
+     * Generate url to be used for uploading file from client side
+     */
+    function generatePresignedUrl(int $libraryId, int $expiresInInMS, string $videoId)
+    {
+        // Endpoint for the Bunny.net Tus uploads
+        $url = "https://video.bunnycdn.com/tusupload";
+
+        // generate authorization signature
+        $signature = $this->__generatePresignedSignature($libraryId, $expiresInInMS, $videoId);
+
+        // Prepare headers
+        $headers = [
+            'AuthorizationSignature' => $signature,
+            'AuthorizationExpire' => $expiresInInMS,
+            'VideoId' => $videoId,
+            'LibraryId' => $libraryId
+        ];
+
+
+        return json_encode([
+            'url' => $url,
+            'headers' => $headers
+        ]);
+    }
+
+    /**
+     * Generates signature for presigned url 
+     */
+    private function __generatePresignedSignature(int $libraryId, int $expiresIn, string $videoId)
+    {
+        $phrase = $libraryId . $this->ApiKey . $expiresIn . $videoId;
+        return hash('sha256', $phrase);
+    }
+
+    /*----------------------------------------------------------------------------*/
 }
