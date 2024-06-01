@@ -1,5 +1,8 @@
 <?php
+
 namespace App\Services;
+
+use App\Http\Requests\Bunny\Video\CreateVideo;
 
 class PublicFileService
 {
@@ -11,7 +14,12 @@ class PublicFileService
     /**
      * Send video file name and gets a url to upload video to
      */
-    public function GetUploadUrl(string $name){
-        return $this->BunnyUploader->UploadVideo($name);
+    public  function GetUploadUrl(string $name)
+    {
+        $payload   = new CreateVideo();
+        $payload->title = $name;
+        $video = $this->BunnyUploader->CreateVideo($payload);
+        return 'success';
+        // return $this->BunnyUploader->GeneratePresignedUrl(248503, 1000 * 60 * 60, $video->guid);
     }
 }

@@ -6,10 +6,12 @@ use App\Http\Requests\Bunny\BaseResponse;
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\Bunny\VideoLibraryResponse;
 use App\Http\Requests\Bunny\VideoCollectionResponse;
-use App\Http\Requests\Bunny\CreateVideo;
+use App\Http\Requests\Bunny\Video\CreateVideo;
 use App\Http\Requests\Bunny\UpdateVideo;
 use App\Http\Requests\Bunny\VideoCaption;
 use App\Http\Requests\Bunny\VideoResponse;
+use Carbon\Carbon;
+
 class BunnyUploader
 {
 
@@ -23,7 +25,7 @@ class BunnyUploader
         $this->VideoLibraryId = env("BUNNY_VIDEO_LIBRARY_ID");
         $this->headers = [
             'AccessKey' => "{$this->ApiKey}",
-            'accept' => 'application/json'
+            'Accept' => 'application/json'
         ];
     }
 
@@ -52,10 +54,9 @@ class BunnyUploader
         $payload = [
             'Name' => $name
         ];
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        $response = Http::withHeaders($this->headers)->post($url, $payload);
+        if ($response->successful())
+            return $response->json();
     }
 
     /**
@@ -65,9 +66,7 @@ class BunnyUploader
     public function ListVideoLibraries()
     {
         $url = "{$this->BaseURL}/videolibrary";
-        return Http::get($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->get($url);
     }
 
     /**
@@ -77,9 +76,7 @@ class BunnyUploader
     public function GetVideoLibrary(int $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
-        return Http::get($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->get($url);
     }
 
     /**
@@ -90,10 +87,7 @@ class BunnyUploader
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
         $this->headers['content-type'] = "application/json";
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->post($url,$payload);
     }
 
     /**
@@ -103,9 +97,7 @@ class BunnyUploader
     public function DeleteVideoLibrary(int $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
-        return Http::delete($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->delete($url);
     }
 
     /*----------------------------------------------------------------------------*/
@@ -126,10 +118,7 @@ class BunnyUploader
         $payload = [
             'Name' => $name
         ];
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->post($url, $payload);
     }
 
     /**
@@ -139,9 +128,7 @@ class BunnyUploader
     public function ListVideoCollections(int $libraryId)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections";
-        return Http::get($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->get($url);
     }
 
     /**
@@ -151,9 +138,7 @@ class BunnyUploader
     public function GetVideoCollection(int $libraryId, int $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
-        return Http::get($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->get($url);
     }
 
     /**
@@ -167,10 +152,7 @@ class BunnyUploader
         $payload = [
             'Name' => $name
         ];
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->post($url, $payload);
     }
 
     /**
@@ -180,9 +162,7 @@ class BunnyUploader
     public function DeleteVideoCollection(int $libraryId, int $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
-        return Http::delete($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->delete($url);
     }
 
 
@@ -194,16 +174,16 @@ class BunnyUploader
 
     /**
      * Create video
-     * @return VideoResponse
+     * return VideoResponse
      */
-    public function CreateVideo(CreateVideo $payload, string $libraryId = $this->VideoLibraryId)
+    public function CreateVideo(CreateVideo $payload, string $libraryId = null)
     {
+        if (!$libraryId) $libraryId = $this->VideoLibraryId;
         $url = "{$this->BaseURL}/library/{$libraryId}/videos";
-        $this->headers['content-type'] = "application/json";
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        $this->headers['Content-Type'] = "application/json";
+        $response = Http::withHeaders($this->headers)->post($url, $payload);
+        if ($response->successful()) return $response->json();
+        return $response->json();
     }
 
     /**
@@ -213,9 +193,7 @@ class BunnyUploader
     public function ListVideos(int $libraryId)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos";
-        return Http::get($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->get($url);
     }
 
     /**
@@ -225,9 +203,7 @@ class BunnyUploader
     public function GetVideo(int $libraryId, string $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
-        return Http::get($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->get($url);
     }
 
     /**
@@ -238,10 +214,7 @@ class BunnyUploader
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
         $this->headers['content-type'] = "application/json";
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->post($url, $payload);
     }
 
     /**
@@ -251,9 +224,7 @@ class BunnyUploader
     public function DeleteVideo(int $libraryId, string $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$libraryId}/videos/{$id}";
-        return Http::delete($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->delete($url);
     }
 
     /**
@@ -264,9 +235,7 @@ class BunnyUploader
     public function SetThumbnail(int $libraryId, string $id, string $thumbnailUrl)
     {
         $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/thumbnail?thumbnailUrl={$thumbnailUrl}";
-        return Http::post($url, [
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->post($url);
     }
 
     /**
@@ -278,10 +247,7 @@ class BunnyUploader
     {
         $url = "{$this->BaseURL}/library/{$libraryId}/videos/{$id}/captions/{$lang}";
         $this->headers['content-type'] = "application/json";
-        return Http::post($url, [
-            'body' => json_encode($payload),
-            'headers' => $this->headers
-        ]);
+        return Http::withHeaders($this->headers)->post($url, $payload);
     }
 
 
@@ -300,21 +266,6 @@ class BunnyUploader
 
 
     /**
-     * Upload video file
-     * Note: Can be replaced with GeneratePresignedUrl to upload from end-user side 
-     */
-    public function UploadVideo(string $id)
-    {
-        $url = "{$this->BaseURL}/library/{$this->VideoLibraryId}/videos/{$id}";
-        return Http::put($url, [
-            'headers' => [
-                'AccessKey' => "{$this->ApiKey}",
-                'accept' => 'application/json',
-            ]
-        ]);
-    }
-
-    /**
      * Generate url to be used for uploading file from client side
      */
     function GeneratePresignedUrl(int $libraryId, int $expiresInInMS, string $videoId)
@@ -322,13 +273,16 @@ class BunnyUploader
         // Endpoint for the Bunny.net Tus uploads
         $url = "https://video.bunnycdn.com/tusupload";
 
+        // get timestamp for future time
+        $timestamp = Carbon::now()->timestamp + $expiresInInMS;
+
         // generate authorization signature
-        $signature = $this->__generatePresignedSignature($libraryId, $expiresInInMS, $videoId);
+        $signature = $this->__generatePresignedSignature($libraryId, $timestamp, $videoId);
 
         // Prepare headers
         $headers = [
             'AuthorizationSignature' => $signature,
-            'AuthorizationExpire' => $expiresInInMS,
+            'AuthorizationExpire' => $timestamp,
             'VideoId' => $videoId,
             'LibraryId' => $libraryId
         ];

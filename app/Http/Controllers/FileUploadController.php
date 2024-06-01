@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Bunny\Video\CreateVideo;
 use Illuminate\Routing\Controller as BaseController;
 use App\Http\Requests\PublicFileCreateRequest;
-use App\Services\PublicFileService;
+use App\Services\BunnyUploader;
 
 class FileUploadController extends BaseController
 {
 
-    public function __construct(private PublicFileService $service)
+    public function __construct(private BunnyUploader $uploader)
     {
     }
 
@@ -19,9 +20,15 @@ class FileUploadController extends BaseController
             // validate request
             $validated = $request->validated();
 
-            return $this->service->GetUploadUrl($validated['name']);
+            $payload   = new CreateVideo();
+            $payload->title = $validated['name'];
+            $video = $this->uploader->CreateVideo($payload);
+            $uuid = $video['guid'];
+            $libraryId = $video['videoLibraryId'];
+            $expiration = 1000 * 60 * 60; // 1 hour
+            return $this->uploader->GeneratePresignedUrl($libraryId, $expiration, $uuid);
         } catch (\Throwable | \Exception $e) {
-            error_log($e->getMessage());
+            return $e;
         }
     }
 }
