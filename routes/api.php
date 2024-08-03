@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CollectionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LibraryController;
@@ -21,5 +22,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
     Route::resource('libraries', LibraryController::class);
-
+    Route::resource('collections', CollectionController::class);
 });
