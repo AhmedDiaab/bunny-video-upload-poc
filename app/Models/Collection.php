@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Library extends Model
+class Collection extends Model
 {
     use HasFactory;
 
@@ -19,7 +19,8 @@ class Library extends Model
 
     protected $fillable = [
         'name',
-        'reference_id'
+        'reference_id',
+        'library_id'
     ];
 
     // Define which attributes should be hidden for arrays
@@ -27,8 +28,8 @@ class Library extends Model
         'updated_at',
     ];
 
-    public function collections()
+    public function library()
     {
-        $this->hasMany(Collection::class);
+        return $this->belongsTo(Library::class);
     }
 }
