@@ -37,7 +37,7 @@ class CreateCollectionRequest extends FormRequest
     {
         return [
             'name' => 'required|string|min:3|max:32',
-            'library' => 'required|int|min:1|exists:App\Models\Library,id'
+            'library_id' => 'required|int|min:1|exists:App\Models\Library,id'
         ];
     }
 
@@ -54,10 +54,10 @@ class CreateCollectionRequest extends FormRequest
             'name.string' => 'The name field must be a string.',
             'name.min' => 'The name field must be at least 3 characters long.',
             'name.max' => 'The name field may not be greater than 32 characters.',
-            'library.required' => 'The library field is required.',
-            'library.int' => 'The library field must be an integer.',
-            'library.min' => 'The library field must be at least :min.',
-            'library.exists' => 'The selected library does not exist in our records.',
+            'library_id.required' => 'The library_id field is required.',
+            'library_id.int' => 'The library_id field must be an integer.',
+            'library_id.min' => 'The library_id field must be at least :min.',
+            'library_id.exists' => 'The selected library_id does not exist in our records.',
         ];
     }
 
