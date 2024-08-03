@@ -9,7 +9,7 @@ class Collection extends Model
 {
     use HasFactory;
 
-    protected $table = 'libraries';
+    protected $table = 'collections';
 
     protected $primaryKey = 'id';
 
