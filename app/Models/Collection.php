@@ -32,4 +32,9 @@ class Collection extends Model
     {
         return $this->belongsTo(Library::class);
     }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
 }

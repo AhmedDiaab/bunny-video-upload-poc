@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Library extends Model
+class Video extends Model
 {
     use HasFactory;
 
-    protected $table = 'libraries';
+    protected $table = 'videos';
 
     protected $primaryKey = 'id';
 
@@ -19,7 +19,10 @@ class Library extends Model
 
     protected $fillable = [
         'name',
-        'reference_id'
+        'url',
+        'reference_id',
+        'library_id',
+        'collection_id'
     ];
 
     // Define which attributes should be hidden for arrays
@@ -27,13 +30,13 @@ class Library extends Model
         'updated_at',
     ];
 
-    public function collections()
+    public function library()
     {
-        $this->hasMany(Collection::class);
+        return $this->belongsTo(Library::class);
     }
 
-    public function videos()
+    public function collection()
     {
-        return $this->hasMany(Video::class);
+        return $this->belongsTo(Collection::class);
     }
 }
