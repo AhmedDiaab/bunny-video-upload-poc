@@ -1,18 +1,18 @@
 version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: laravel-app
+  db:
+    image: mysql:latest
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: app
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: laravelpassword
     ports:
-        - "8000:8000" # Expose PHP-FPM port internally
+      - "3306:3306"
     volumes:
-      - .:/var/www
-    networks: 
-      - appnet    
+      - mysql-data:/var/lib/mysql
 
-networks:
-  appnet:
-    driver: bridge
+volumes:
+  mysql-data:
