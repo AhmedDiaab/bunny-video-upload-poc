@@ -1,7 +1,9 @@
 <?php
-namespace App\Http\Requests\Bunny;
 
-class UpdateVideo {
+namespace App\Http\Requests\Bunny\Video;
+
+class UpdateVideo
+{
     public ?string $title = null;
     public ?string $collectionId = null;
     /** @var Chapter[]|null */
@@ -10,20 +12,33 @@ class UpdateVideo {
     public ?array $moments = null;
     /** @var MetaTag[]|null */
     public ?array $metaTags = null;
+
+    public function setTitle(string $title)
+    {
+        $this->title = $title;
+    }
+
+    public function setCollection(string $collection)
+    {
+        $this->collectionId = $collection;
+    }
 }
 
-class Chapter {
+class Chapter
+{
     public string $title;
-    public? int $start;
-    public? int $end;
+    public ?int $start;
+    public ?int $end;
 }
 
-class Moment {
+class Moment
+{
     public string $label;
-    public? int $timestamp;
+    public ?int $timestamp;
 }
 
-class MetaTag {
+class MetaTag
+{
     public ?string $property = null;
     public ?string $value = null;
 }
