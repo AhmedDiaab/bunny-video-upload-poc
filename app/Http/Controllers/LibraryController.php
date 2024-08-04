@@ -28,6 +28,7 @@ class LibraryController extends BaseController
             $name = $validated['name'];
             $library = $this->uploader->CreateVideoLibrary($name);
             $reference = $library['Id'];
+            $validated['api_key'] = $library['ApiKey'];
             $validated['reference_id'] = $reference;
             $record = Library::create($validated);
         } catch (\Exception $e) {
