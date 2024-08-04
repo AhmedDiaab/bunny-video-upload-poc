@@ -11,11 +11,12 @@ use App\Http\Requests\Bunny\UpdateVideo;
 use App\Http\Requests\Bunny\VideoCaption;
 use App\Http\Requests\Bunny\VideoResponse;
 use Carbon\Carbon;
+use Illuminate\Http\Client\Response;
 
 class BunnyUploader
 {
 
-    private $BaseURL = "https://video.bunnycdn.com";
+    private $BaseURL = "https://api.bunny.net";
     private $ApiKey;
     private $VideoLibraryId;
     private $headers;
@@ -55,8 +56,7 @@ class BunnyUploader
             'Name' => $name
         ];
         $response = Http::withHeaders($this->headers)->post($url, $payload);
-        if ($response->successful())
-            return $response->json();
+        return $this->__handleResponse($response);
     }
 
     /**
@@ -66,7 +66,8 @@ class BunnyUploader
     public function ListVideoLibraries()
     {
         $url = "{$this->BaseURL}/videolibrary";
-        return Http::withHeaders($this->headers)->get($url);
+        $response = Http::withHeaders($this->headers)->get($url);
+        return $this->__handleResponse($response);
     }
 
     /**
@@ -76,18 +77,21 @@ class BunnyUploader
     public function GetVideoLibrary(int $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
-        return Http::withHeaders($this->headers)->get($url);
+        $response = Http::withHeaders($this->headers)->get($url);
+        return $this->__handleResponse($response);
     }
 
     /**
-     * Update video library
+     * Update video library 
+     * accepts VideoLibraryResponse
      * @return VideoLibraryResponse
      */
-    public function UpdateVideoLibrary(int $id, VideoLibraryResponse $payload)
+    public function UpdateVideoLibrary(int $id, $payload)
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
         $this->headers['content-type'] = "application/json";
-        return Http::withHeaders($this->headers)->post($url,$payload);
+        $response = Http::withHeaders($this->headers)->post($url, $payload);
+        return $this->__handleResponse($response);
     }
 
     /**
@@ -97,7 +101,8 @@ class BunnyUploader
     public function DeleteVideoLibrary(int $id)
     {
         $url = "{$this->BaseURL}/videolibrary/{$id}";
-        return Http::withHeaders($this->headers)->delete($url);
+        $response = Http::withHeaders($this->headers)->delete($url);
+        return $this->__handleResponse($response);
     }
 
     /*----------------------------------------------------------------------------*/
@@ -304,4 +309,27 @@ class BunnyUploader
     }
 
     /*----------------------------------------------------------------------------*/
+
+    /**
+     * Utility functions
+     * 
+     */
+
+    /**
+     * Returns response body if successful
+     * or throws BadRequest if fails
+     */
+    private function __handleResponse(Response $response)
+    {
+        // Check if the response was successful
+        if ($response->successful()) return $response->json();
+
+        // Handle the error case
+        return [
+            'success' => false,
+            'message' => 'Failed to create video library',
+            'status' => $response->status(),
+            'error' => $response->json(),
+        ];
+    }
 }

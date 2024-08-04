@@ -25,7 +25,10 @@ class LibraryController extends BaseController
         $validated = $request->validated();
         $record = null;
         try {
-            $validated['reference_id'] = '1234';
+            $name = $validated['name'];
+            $library = $this->uploader->CreateVideoLibrary($name);
+            $reference = $library['Id'];
+            $validated['reference_id'] = $reference;
             $record = Library::create($validated);
         } catch (\Exception $e) {
             throw $e;
@@ -41,21 +44,27 @@ class LibraryController extends BaseController
 
     public function update(UpdateLibraryRequest $request, Library $library)
     {
-        $request->validate([
-            'title' => 'sometimes|required|string|max:255',
-        ]);
-
-        $library->update($request->all());
-
+        $validated = $request->validated();
+        try {
+            $payload = [
+                'Name' => $validated['name']
+            ];
+            $this->uploader->UpdateVideoLibrary($library['reference_id'], $payload);
+            $library->update($validated);
+        } catch (\Exception $e) {
+            throw $e;
+        }
         return response()->json($library, 200);
     }
 
     public function destroy(Library $library)
     {
-        $library->delete();
-
+        try {
+            $this->uploader->DeleteVideoLibrary($library['reference_id']);
+            $library->delete();
+        } catch (\Exception $e) {
+            throw $e;
+        }
         return response()->json(null, 204);
     }
-
-
 }
