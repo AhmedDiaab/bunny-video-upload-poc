@@ -35,9 +35,10 @@ class VideoController extends BaseController
         return response()->json($record, 201);
     }
 
-    public function show(Video $Video)
+    public function show(Video $video)
     {
-        return $Video;
+        $video->load(['library', 'collection']);
+        return $video;
     }
 
     public function update(UpdateVideoRequest $request, Video $video)
