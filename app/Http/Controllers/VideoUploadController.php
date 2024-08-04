@@ -3,18 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Bunny\Video\CreateVideo;
+use App\Http\Requests\GetUploadUrlRequest;
+use App\Models\Video;
 use Illuminate\Routing\Controller as BaseController;
-use App\Http\Requests\PublicFileCreateRequest;
 use App\Services\BunnyUploader;
 
-class FileUploadController extends BaseController
+class VideoUploadController extends BaseController
 {
 
     public function __construct(private BunnyUploader $uploader)
     {
     }
 
-    public function GetUploadUrl(PublicFileCreateRequest $request)
+    public function GetUploadUrl(Video $video, GetUploadUrlRequest $request)
     {
         try {
             // validate request

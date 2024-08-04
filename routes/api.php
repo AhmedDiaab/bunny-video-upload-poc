@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\VideoUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,4 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::resource('libraries', LibraryController::class);
     Route::resource('collections', CollectionController::class);
     Route::resource('videos', VideoController::class);
+    Route::prefix('{video}/upload-url')->group(function () {
+        Route::post('/', [VideoUploadController::class, 'GetUploadUrl']);
+    });
 });

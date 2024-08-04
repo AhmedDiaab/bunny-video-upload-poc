@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 
-class PublicFileCreateRequest extends FormRequest
+class GetUploadUrlRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -34,7 +36,7 @@ class PublicFileCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['required', 'string', 'max:32'],
+            'name' => 'required|string|max:32',
         ];
     }
 
@@ -50,5 +52,15 @@ class PublicFileCreateRequest extends FormRequest
             'name.string' => 'name property must be string',
             'name.max' => 'name max length is 32 characters',
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        $response = response()->json([
+            'errors' => $validator->errors(),
+            'message' => 'Validation failed.',
+        ], 422);
+
+        throw new ValidationException($validator, $response);
     }
 }
