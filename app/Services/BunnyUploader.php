@@ -17,6 +17,7 @@ class BunnyUploader
 {
 
     private $BaseURL = "https://api.bunny.net";
+    private $BunnyCDN = "https://video.bunnycdn.com";
     private $ApiKey;
     private $VideoLibraryId;
     private $headers;
@@ -116,23 +117,26 @@ class BunnyUploader
      * Create video collection
      * @return VideoCollectionResponse
      */
-    public function CreateVideoCollection(int $libraryId, string $name)
+    public function CreateVideoCollection(int $libraryId, string $libraryApiKey, string $name)
     {
-        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections";
+        $url = "{$this->BunnyCDN}/library/{$libraryId}/collections";
         $this->headers['content-type'] = "application/json";
+        $this->headers['AccessKey'] = $libraryApiKey;
         $payload = [
             'Name' => $name
         ];
-        return Http::withHeaders($this->headers)->post($url, $payload);
+        $response = Http::withHeaders($this->headers)->post($url, $payload);
+        return $this->__handleResponse($response);
     }
 
     /**
      * List video collection
      * @return VideoCollectionResponse[]
      */
-    public function ListVideoCollections(int $libraryId)
+    public function ListVideoCollections(int $libraryId, string $libraryApiKey)
     {
-        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections";
+        $url = "{$this->BunnyCDN}/library/{$libraryId}/collections";
+        $this->headers['AccessKey'] = $libraryApiKey;
         return Http::withHeaders($this->headers)->get($url);
     }
 
@@ -140,9 +144,10 @@ class BunnyUploader
      * Get video collection
      * @return VideoCollectionResponse
      */
-    public function GetVideoCollection(int $libraryId, int $id)
+    public function GetVideoCollection(int $libraryId, string $libraryApiKey, int $uuid)
     {
-        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
+        $url = "{$this->BunnyCDN}/library/{$libraryId}/collections/{$uuid}";
+        $this->headers['AccessKey'] = $libraryApiKey;
         return Http::withHeaders($this->headers)->get($url);
     }
 
@@ -150,10 +155,11 @@ class BunnyUploader
      * Update video collection
      * @return VideoCollectionResponse
      */
-    public function UpdateVideoCollection(int $libraryId, int $id, string $name)
+    public function UpdateVideoCollection(int $libraryId, string $libraryApiKey, string $uuid, string $name)
     {
-        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
+        $url = "{$this->BunnyCDN}/library/{$libraryId}/collections/{$uuid}";
         $this->headers['content-type'] = "application/json";
+        $this->headers['AccessKey'] = $libraryApiKey;
         $payload = [
             'Name' => $name
         ];
@@ -164,9 +170,10 @@ class BunnyUploader
      * Delete video collection
      * @return VideoCollectionResponse
      */
-    public function DeleteVideoCollection(int $libraryId, int $id)
+    public function DeleteVideoCollection(int $libraryId, string $libraryApiKey, string $uuid)
     {
-        $url = "{$this->BaseURL}/videolibrary/{$libraryId}/collections/{$id}";
+        $url = "{$this->BunnyCDN}/library/{$libraryId}/collections/{$uuid}";
+        $this->headers['AccessKey'] = $libraryApiKey;
         return Http::withHeaders($this->headers)->delete($url);
     }
 
@@ -327,7 +334,7 @@ class BunnyUploader
         // Handle the error case
         return [
             'success' => false,
-            'message' => 'Failed to create video library',
+            'message' => 'Failed to create resource',
             'status' => $response->status(),
             'error' => $response->json(),
         ];
