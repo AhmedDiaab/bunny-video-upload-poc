@@ -19,7 +19,8 @@ class Library extends Model
 
     protected $fillable = [
         'name',
-        'reference_id'
+        'reference_id',
+        'api_key'
     ];
 
     // Define which attributes should be hidden for arrays
