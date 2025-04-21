@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\BunnyUploader;
+namespace App\Services\Bunny;
 
 use App\Http\Requests\Bunny\BaseResponse;
 use Illuminate\Support\Facades\Http;

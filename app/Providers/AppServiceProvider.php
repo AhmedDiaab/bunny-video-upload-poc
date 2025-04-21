@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Services\BunnyUploader\BunnyUploader;
-use App\Services\BunnyUploader\BunnyVideoLibrary\BunnyLibraryManager;
+use App\Services\Bunny\BunnyUploader;
+use App\Services\Bunny\BunnyVideoLibrary\BunnyLibraryManager;
 
 class AppServiceProvider extends ServiceProvider
 {

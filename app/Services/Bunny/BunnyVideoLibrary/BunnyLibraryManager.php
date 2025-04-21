@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services\BunnyUploader\BunnyVideoLibrary;
+namespace App\Services\Bunny\BunnyVideoLibrary;
 
-use App\Services\BunnyUploader\BunnyUploader;
+use App\Services\Bunny\BunnyUploader;
 use Illuminate\Support\Facades\Http;
 use App\Http\Requests\Bunny\VideoLibraryResponse;
 

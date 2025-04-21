@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
-use App\Services\BunnyUploader;
+use App\Services\Bunny\BunnyUploader;
 use App\Http\Requests\Collection\CreateCollectionRequest;
 use App\Http\Requests\Collection\UpdateCollectionRequest;
 use App\Models\Collection;

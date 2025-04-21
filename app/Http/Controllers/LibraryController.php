@@ -6,7 +6,7 @@ use Illuminate\Routing\Controller as BaseController;
 use App\Http\Requests\Library\CreateLibraryRequest;
 use App\Http\Requests\Library\UpdateLibraryRequest;
 use App\Models\Library;
-use App\Services\BunnyUploader\BunnyVideoLibrary\BunnyLibraryManager;
+use App\Services\Bunny\BunnyVideoLibrary\BunnyLibraryManager;
 
 class LibraryController extends BaseController
 {
