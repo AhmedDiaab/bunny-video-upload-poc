@@ -5,17 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Bunny\Video\UpdateVideo;
 use App\Http\Requests\Bunny\Video\CreateVideo;
 use Illuminate\Routing\Controller as BaseController;
-use App\Services\BunnyUploader;
 use App\Http\Requests\Video\CreateVideoRequest;
 use App\Http\Requests\Video\UpdateVideoRequest;
 use App\Models\Collection;
 use App\Models\Library;
 use App\Models\Video;
+use App\Services\Bunny\BunnyVideo\BunnyVideoManager;
 
 class VideoController extends BaseController
 {
 
-    public function __construct(private BunnyUploader $uploader)
+    public function __construct(private BunnyVideoManager $videoManager)
     {
     }
 
@@ -38,7 +38,7 @@ class VideoController extends BaseController
             $videoPayload = new CreateVideo();
             $videoPayload->setTitle($name);
             $videoPayload->setCollection($collection_reference);
-            $video = $this->uploader->CreateVideo($library_reference, $library_api_key, $videoPayload);
+            $video = $this->videoManager->CreateVideo($library_reference, $library_api_key, $videoPayload);
             $validated['reference_id'] = $video['guid'];
             $validated['url'] = 'N/A';
             $record = Video::create($validated);
@@ -69,7 +69,7 @@ class VideoController extends BaseController
             $videoPayload = new UpdateVideo();
             $videoPayload->setTitle($name);
             $videoPayload->setCollection($collection_reference);
-            $video = $this->uploader->UpdateVideo($library_reference, $library_api_key, $record['reference_id'], $videoPayload);
+            $video = $this->videoManager->UpdateVideo($library_reference, $library_api_key, $record['reference_id'], $videoPayload);
             $record->update($validated);
         } catch (\Exception $e) {
             throw $e;
@@ -82,7 +82,7 @@ class VideoController extends BaseController
         try {
             $video = Video::where('id', $id)->first();
             $library = Library::where('id', $video['library_id'])->first();
-            $this->uploader->DeleteVideo($library['reference_id'], $library['api_key'], $video['reference_id']);
+            $this->videoManager->DeleteVideo($library['reference_id'], $library['api_key'], $video['reference_id']);
             $video->delete();
         } catch (\Exception $e) {
             throw $e;
