@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\BunnyUploader;
 
 use App\Http\Requests\Bunny\BaseResponse;
 use Illuminate\Support\Facades\Http;
-use App\Http\Requests\Bunny\VideoLibraryResponse;
 use App\Http\Requests\Bunny\VideoCollectionResponse;
 use App\Http\Requests\Bunny\Video\CreateVideo;
 use App\Http\Requests\Bunny\Video\UpdateVideo;
@@ -16,15 +15,17 @@ use Illuminate\Http\Client\Response;
 class BunnyUploader
 {
 
-    private $BaseURL = "https://api.bunny.net";
-    private $BunnyCDN = "https://video.bunnycdn.com";
-    private $ApiKey;
-    private $VideoLibraryId;
-    private $headers;
+    protected $BaseURL;
+    protected $BunnyCDN;
+    protected $ApiKey;
+    protected $VideoLibraryId;
+    protected $headers;
     public function __construct()
     {
+        $this->BaseURL = env("BUNNY_BASE_URL");
+        $this->BunnyCDN = env("BUNNY_CDN_URL");
         $this->ApiKey = env('BUNNY_VIDEO_API_KEY');
-        $this->VideoLibraryId = env("BUNNY_VIDEO_LIBRARY_ID");
+        $this->VideoLibraryId = env("BUNNY_DEFAULT_VIDEO_LIBRARY_ID");
         $this->headers = [
             'AccessKey' => "{$this->ApiKey}",
             'Accept' => 'application/json'
@@ -41,70 +42,7 @@ class BunnyUploader
      * 6. Generate presigned upload url for uploading video from end user side
      */
 
-    /**
-     * Video library
-     */
-
-    /**
-     * Create video library
-     * @return VideoLibraryResponse
-     */
-    public function CreateVideoLibrary(string $name)
-    {
-        $url = "{$this->BaseURL}/videolibrary";
-        $this->headers['content-type'] = "application/json";
-        $payload = [
-            'Name' => $name
-        ];
-        $response = Http::withHeaders($this->headers)->post($url, $payload);
-        return $this->__handleResponse($response);
-    }
-
-    /**
-     * List video libraries
-     * @return VideoLibraryResponse[]
-     */
-    public function ListVideoLibraries()
-    {
-        $url = "{$this->BaseURL}/videolibrary";
-        $response = Http::withHeaders($this->headers)->get($url);
-        return $this->__handleResponse($response);
-    }
-
-    /**
-     * Get video library
-     * @return VideoLibraryResponse
-     */
-    public function GetVideoLibrary(int $id)
-    {
-        $url = "{$this->BaseURL}/videolibrary/{$id}";
-        $response = Http::withHeaders($this->headers)->get($url);
-        return $this->__handleResponse($response);
-    }
-
-    /**
-     * Update video library 
-     * accepts VideoLibraryResponse
-     * @return VideoLibraryResponse
-     */
-    public function UpdateVideoLibrary(int $id, $payload)
-    {
-        $url = "{$this->BaseURL}/videolibrary/{$id}";
-        $this->headers['content-type'] = "application/json";
-        $response = Http::withHeaders($this->headers)->post($url, $payload);
-        return $this->__handleResponse($response);
-    }
-
-    /**
-     * Delete video library
-     * @return VideoLibraryResponse
-     */
-    public function DeleteVideoLibrary(int $id)
-    {
-        $url = "{$this->BaseURL}/videolibrary/{$id}";
-        $response = Http::withHeaders($this->headers)->delete($url);
-        return $this->__handleResponse($response);
-    }
+    
 
     /*----------------------------------------------------------------------------*/
 
@@ -297,7 +235,7 @@ class BunnyUploader
         $timestamp = Carbon::now()->timestamp + $expiresInInMS;
 
         // generate authorization signature
-        $signature = $this->__generatePresignedSignature($libraryId, $timestamp, $videoId);
+        $signature = $this->__generatePresignedSignature($libraryId, $libraryApiKey, $timestamp, $videoId);
 
         // Prepare headers
         $headers = [
@@ -317,24 +255,19 @@ class BunnyUploader
     /**
      * Generates signature for presigned url 
      */
-    private function __generatePresignedSignature(int $libraryId, int $expiresIn, string $videoId)
+    private function __generatePresignedSignature(int $libraryId, string $libraryApiKey, int $expiresIn, string $videoId)
     {
-        $phrase = $libraryId . $this->ApiKey . $expiresIn . $videoId;
+        $phrase = $libraryId . $libraryApiKey . $expiresIn . $videoId;
         return hash('sha256', $phrase);
     }
 
     /*----------------------------------------------------------------------------*/
 
     /**
-     * Utility functions
-     * 
-     */
-
-    /**
      * Returns response body if successful
      * or throws BadRequest if fails
      */
-    private function __handleResponse(Response $response)
+    protected function __handleResponse(Response $response)
     {
         // Check if the response was successful
         if ($response->successful()) return $response->json();

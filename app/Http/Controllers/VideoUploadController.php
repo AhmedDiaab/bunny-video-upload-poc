@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Bunny\Video\CreateVideo;
-use App\Http\Requests\GetUploadUrlRequest;
 use App\Models\Video;
 use Illuminate\Routing\Controller as BaseController;
-use App\Services\BunnyUploader;
+use App\Services\BunnyUploader\BunnyUploader;
 
 class VideoUploadController extends BaseController
 {
@@ -15,19 +14,16 @@ class VideoUploadController extends BaseController
     {
     }
 
-    public function GetUploadUrl(Video $video, GetUploadUrlRequest $request)
+    public function GetUploadUrl(int $id)
     {
         try {
             // validate request
-            $validated = $request->validated();
-
-            $payload   = new CreateVideo();
-            $payload->title = $validated['name'];
-            $video = $this->uploader->CreateVideo($payload);
-            $uuid = $video['guid'];
-            $libraryId = $video['videoLibraryId'];
+            $video = Video::where('id', $id)->first();
+            $video->load(['library', 'collection']);
             $expiration = 1000 * 60 * 60; // 1 hour
-            return $this->uploader->GeneratePresignedUrl($libraryId, $expiration, $uuid);
+            $library_reference = $video['library']['reference_id'];
+            $library_api_key = $video['library']['api_key'];
+            return $this->uploader->GeneratePresignedUrl($library_reference, $library_api_key, $expiration, $video['reference_id']);
         } catch (\Throwable | \Exception $e) {
             return $e;
         }

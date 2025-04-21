@@ -26,7 +26,7 @@ Route::prefix('v1')->group(function () {
     Route::resource('libraries', LibraryController::class);
     Route::resource('collections', CollectionController::class);
     Route::resource('videos', VideoController::class);
-    Route::prefix('{video}/upload-url')->group(function () {
-        Route::post('/', [VideoUploadController::class, 'GetUploadUrl']);
+    Route::prefix('videos/{video}/upload-url')->group(function () {
+        Route::get('/', [VideoUploadController::class, 'GetUploadUrl']);
     });
 });

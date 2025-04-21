@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
-use App\Services\BunnyUploader;
 use App\Http\Requests\Library\CreateLibraryRequest;
 use App\Http\Requests\Library\UpdateLibraryRequest;
 use App\Models\Library;
+use App\Services\BunnyUploader\BunnyVideoLibrary\BunnyLibraryManager;
 
 class LibraryController extends BaseController
 {
 
-    public function __construct(private BunnyUploader $uploader)
+    public function __construct(private BunnyLibraryManager $libraryManager)
     {
     }
 
@@ -26,7 +26,7 @@ class LibraryController extends BaseController
         $record = null;
         try {
             $name = $validated['name'];
-            $library = $this->uploader->CreateVideoLibrary($name);
+            $library = $this->libraryManager->CreateVideoLibrary($name);
             $reference = $library['Id'];
             $validated['api_key'] = $library['ApiKey'];
             $validated['reference_id'] = $reference;
@@ -50,7 +50,7 @@ class LibraryController extends BaseController
             $payload = [
                 'Name' => $validated['name']
             ];
-            $this->uploader->UpdateVideoLibrary($library['reference_id'], $payload);
+            $this->libraryManager->UpdateVideoLibrary($library['reference_id'], $payload);
             $library->update($validated);
         } catch (\Exception $e) {
             throw $e;
@@ -61,7 +61,7 @@ class LibraryController extends BaseController
     public function destroy(Library $library)
     {
         try {
-            $this->uploader->DeleteVideoLibrary($library['reference_id']);
+            $this->libraryManager->DeleteVideoLibrary($library['reference_id']);
             $library->delete();
         } catch (\Exception $e) {
             throw $e;
