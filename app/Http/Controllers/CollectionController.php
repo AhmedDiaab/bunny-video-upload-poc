@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Routing\Controller as BaseController;
-use App\Services\Bunny\BunnyUploader;
+use App\Services\Bunny\BunnyVideoCollection\BunnyCollectionManager;
 use App\Http\Requests\Collection\CreateCollectionRequest;
 use App\Http\Requests\Collection\UpdateCollectionRequest;
 use App\Models\Collection;
@@ -12,7 +12,7 @@ use App\Models\Library;
 class CollectionController extends BaseController
 {
 
-    public function __construct(private BunnyUploader $uploader)
+    public function __construct(private BunnyCollectionManager $collectionManager)
     {
     }
 
@@ -34,7 +34,7 @@ class CollectionController extends BaseController
             $library = Library::where('id', $validated['library_id'])->first();
             $library_reference = (int) $library->reference_id;
             $library_api_key = $library->api_key;
-            $collection = $this->uploader->CreateVideoCollection($library_reference, $library_api_key, $name);
+            $collection = $this->collectionManager->CreateVideoCollection($library_reference, $library_api_key, $name);
             $validated['reference_id'] = $collection['guid'];
             $record = Collection::create($validated);
         } catch (\Exception $e) {
@@ -59,7 +59,7 @@ class CollectionController extends BaseController
             $library_reference = (int) $library->reference_id;
             $library_api_key = $library->api_key;
             $collection = Collection::where('id', (int) $id)->first();
-            $this->uploader->UpdateVideoCollection($library_reference, $library_api_key, $collection['reference_id'], $name);
+            $this->collectionManager->UpdateVideoCollection($library_reference, $library_api_key, $collection['reference_id'], $name);
             $collection->update($validated);
         } catch (\Exception $e) {
             throw $e;
@@ -74,7 +74,7 @@ class CollectionController extends BaseController
             $library = Library::where('id', $collection['library_id'])->first();
             $library_reference = (int) $library->reference_id;
             $library_api_key = $library->api_key;
-            $this->uploader->DeleteVideoCollection((int) $library_reference, $library_api_key, $collection['reference_id']);
+            $this->collectionManager->DeleteVideoCollection((int) $library_reference, $library_api_key, $collection['reference_id']);
             $collection->delete();
         } catch (\Exception $e) {
             throw $e;
