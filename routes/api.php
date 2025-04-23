@@ -29,4 +29,5 @@ Route::prefix('v1')->group(function () {
     Route::prefix('videos/{video}/upload-url')->group(function () {
         Route::get('/', [VideoUploadController::class, 'GetUploadUrl']);
     });
+    Route::post('video-update-notification', [VideoUploadController::class, 'NotificationWebHook']);
 });

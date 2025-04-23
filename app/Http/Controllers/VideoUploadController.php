@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Bunny\VideoNotificationWebHookRequest;
 use App\Models\Video;
 use App\Services\Bunny\BunnyVideo\BunnyVideoMetadataManager;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 
 
@@ -27,5 +29,14 @@ class VideoUploadController extends BaseController
         } catch (\Throwable | \Exception $e) {
             return $e;
         }
+    }
+
+    public function NotificationWebHook(Request $request) {
+        logger()->info('Webhook raw data:', $request->all());
+
+        $payload = new VideoNotificationWebHookRequest($request->all());
+        // update video record in database
+        Video::where('reference_id', $payload->VideoGuid)->update(['video_upload_status' => $payload->MapStatusToText()]);
+        return response()->json(null, 204);
     }
 }

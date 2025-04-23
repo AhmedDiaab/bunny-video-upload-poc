@@ -40,7 +40,6 @@ class VideoController extends BaseController
             $videoPayload->setCollection($collection_reference);
             $video = $this->videoManager->CreateVideo($library_reference, $library_api_key, $videoPayload);
             $validated['reference_id'] = $video['guid'];
-            $validated['url'] = 'N/A';
             $record = Video::create($validated);
         } catch (\Exception $e) {
             throw $e;

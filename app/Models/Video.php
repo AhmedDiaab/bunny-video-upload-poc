@@ -19,10 +19,10 @@ class Video extends Model
 
     protected $fillable = [
         'name',
-        'url',
         'reference_id',
         'library_id',
-        'collection_id'
+        'collection_id',
+        'video_upload_status'
     ];
 
     // Define which attributes should be hidden for arrays
